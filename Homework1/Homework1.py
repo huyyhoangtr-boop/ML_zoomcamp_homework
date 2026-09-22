@@ -1,5 +1,3 @@
-from ast import If
-
 import numpy as np
 import pandas as pd
 
