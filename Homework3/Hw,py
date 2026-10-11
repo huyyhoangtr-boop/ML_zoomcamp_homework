@@ -26,7 +26,7 @@ print (df["industry"].mode(0))
 
 
 #Q2
-
+'''
 for i in num_for:
     print (i)
     p = df[num_for].corrwith(df[i])
@@ -34,8 +34,9 @@ for i in num_for:
     print(p[p<1].max())
     print ()
     num_for = num_for[num_for != i] 
-
-
+'''
+corr = df[num_for].drop("converted", axis = 1).corr()
+print (corr)
 #Q3
 
 df_full_train, df_test = train_test_split(df, test_size=0.2, random_state=42)
@@ -70,7 +71,7 @@ Y_pred = model.predict_proba (X_val)
 print ((((Y_pred[:,1] >= 0.5).astype("int") == target_val.values.T).astype("int").mean()).__round__(2))
 
 
-print ((1/(1+ np.e**(-(X_val.dot(w.T))) >= 0.5).astype("int") == target_val.values).astype("int").mean()) #--> có sai số do thiếu w0
+#print ((1/(1+ np.e**(-(X_val.dot(w.T))) >= 0.5).astype("int") == target_val.values).astype("int").mean()) #--> có sai số do thiếu w0
 
 #Q5
 original_accuracy = (((Y_pred[:,1] >= 0.5).astype("int") == target_val.values.T).astype("int").mean())
@@ -91,7 +92,7 @@ for c in np.array([0.000001, 0.00001, 0.0001, 0.001]):
     w = (np.linalg.inv(np.dot(X_train.T, X_train) + c * np.eye(X_train.shape[1])).dot(X_train.T)).dot(target_train)
     print (w)
     Y_pred = np.dot (X_val, w)
-    print (Y_pred.max(), Y_pred.min())
+    #print (Y_pred.max(), Y_pred.min())
     #Y_pred = 1/ (1+ np.e ** (-Y_pred))
     accuracy = ((Y_pred >= 0.5).astype ("int") == target_val).astype("int").mean().__round__(3)
     print ("accuracy is", accuracy)
