@@ -93,7 +93,7 @@ for c in np.array([0.000001, 0.00001, 0.0001, 0.001]):
     print (w)
     Y_pred = np.dot (X_val, w)
     #print (Y_pred.max(), Y_pred.min())
-    #Y_pred = 1/ (1+ np.e ** (-Y_pred))
+    Y_pred = 1/ (1+ np.e ** (-Y_pred))
     accuracy = ((Y_pred >= 0.5).astype ("int") == target_val).astype("int").mean().__round__(3)
     print ("accuracy is", accuracy)
     print ()
