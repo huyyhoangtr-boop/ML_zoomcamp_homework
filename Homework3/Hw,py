@@ -59,7 +59,7 @@ for i in category:
 #Q4
 dict = df_train.to_dict(orient = "records")
 X_train = dv.fit_transform (dict)
-X_val = dv.fit_transform(df_val.to_dict(orient = "records"))
+X_val = dv.transform(df_val.to_dict(orient = "records"))
 model = lgR(solver='liblinear', C=1.0, max_iter=1000, random_state=42)
 model.fit(X_train, target_train)
 w = model.coef_
@@ -78,8 +78,9 @@ original_accuracy = (((Y_pred[:,1] >= 0.5).astype("int") == target_val.values.T)
 
 for i in ["lead_source", "number_of_courses_viewed", "interaction_count"]:
     dict1 = df_train.drop(i, axis = 1).to_dict(orient ="records")
-    X_val1 = dv.fit_transform(df_val.drop(i, axis = 1).to_dict(orient = "records"))
+    
     X_train1 = dv.fit_transform(dict1)
+    X_val1 = dv.transform(df_val.drop(i, axis = 1).to_dict(orient = "records"))
     model.fit(X_train1, target_train)
     Y_pred1 = model.predict_proba (X_val1)
     a = ((Y_pred1.T[1] >= 0.5).astype('int') == target_val).astype("int").mean()
@@ -87,16 +88,9 @@ for i in ["lead_source", "number_of_courses_viewed", "interaction_count"]:
     
 #Q6
 for c in np.array([0.000001, 0.00001, 0.0001, 0.001]):
-    X_train = np.column_stack ([np.ones(X_train.shape[0]), X_train])
-    X_val = np.column_stack ([np.ones(X_val.shape[0]), X_val])
-    w = (np.linalg.inv(np.dot(X_train.T, X_train) + c * np.eye(X_train.shape[1])).dot(X_train.T)).dot(target_train)
-    print (w)
-    Y_pred = np.dot (X_val, w)
-    #print (Y_pred.max(), Y_pred.min())
-    Y_pred = 1/ (1+ np.e ** (-Y_pred))
-    accuracy = ((Y_pred >= 0.5).astype ("int") == target_val).astype("int").mean().__round__(3)
-    print ("accuracy is", accuracy)
-    print ()
+    model = lgR(solver='liblinear', C=c, max_iter=1000, random_state=42)
+    model.fit(X_train, target_train)
+    w = model.coef_
 
-#print (df_train.drop("lead_source"))
-
+    Y_pred = model.predict_proba (X_val)
+    print ("c = ", c, "--> accuracy",(((Y_pred[:,1] >= 0.5).astype("int") == target_val.values.T).astype("int").mean()).__round__(3))
