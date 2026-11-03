@@ -31,13 +31,14 @@ del df_val["fuel_efficiency_mpg"]
 # dv
 from sklearn.feature_extraction import DictVectorizer 
 dv = DictVectorizer(sparse=True)
-df = df.to_dict(orient = "records")
-dv.fit(df)
+df_train = df_train.to_dict(orient = "records")
+dv.fit(df_train)
+x_train = dv.transform(df_train)
 def dv_turn(df):
     df = df.to_dict(orient = "records")
     x = dv.transform(df)
     return x
-x_train = dv_turn(df_train)
+#x_train = dv_turn(df_train)
 x_val = dv_turn(df_val)
 x_test = dv_turn(df_test)
 x_full_train = dv_turn(df_full_train)
@@ -64,15 +65,16 @@ for i in [10, 50, 100, 150]:
     model_forest = RandomForestRegressor(n_estimators=i,random_state=1,n_jobs=-1)
     model_forest. fit(x_train, target_train)
     y_pred = model_forest.predict(x_val)
-    dict_rmse["%s_%s" % ('n_estimators', i)] = rmse(target_val, y_pred)
+    dict_rmse["%s_%s" % ('n_estimators', i)] = rmse(target_val, y_pred).__round__(3)
 
 print (min(dict_rmse, key = dict_rmse.get))
 print()
 
 #Q4
-list_rmse = []
+
 dict_rmse_q4 = {}
 for depth in  [10, 15, 20, 25]:
+    list_rmse = []
     for estimators in [10, 50, 100, 150]:
         model_forest = RandomForestRegressor(n_estimators=estimators, max_depth=depth,random_state=1,n_jobs=-1)
         model_forest. fit(x_train, target_train)
@@ -95,8 +97,12 @@ for i in model_forest.feature_importances_:
 for items, key in dictionary.items():
     for i in [ "engine_displacement", "acceleration", "horsepower", "vehicle_weight"]:
         if items == i: print (dictionary[items])
+importances = dict(zip(dv.get_feature_names_out(), model_forest.feature_importances_))
+for f in ["vehicle_weight", "horsepower", "acceleration", "engine_displacement"]:
+    print(f, round(importances[f], 4))
         
 import xgboost as xgb
+scores ={}
 for i in [0.3,0.1]:
     X_train_xgb = xgb.DMatrix(x_train, target_train,feature_names= list(feature))
     X_val_xgb = xgb.DMatrix(x_val, target_val,feature_names= list(feature))# enable_categorical = True)
@@ -109,4 +115,15 @@ for i in [0.3,0.1]:
             "seed": 1,
             "verbosity":1
         }
-    model = xgb.train(xgb_params, X_train_xgb, num_boost_round = 100, verbose_eval =1,evals = [(X_train_xgb, "train"), (X_val_xgb, "val")])
+    result = {}
+    model = xgb.train(
+        xgb_params, 
+        X_train_xgb, 
+        num_boost_round = 100, 
+        verbose_eval =1,
+        evals = [(X_train_xgb, "train"), (X_val_xgb, "val")],
+        evals_result = result
+        )
+    #print (result)
+    scores[i] = result['val']['rmse'][-1]
+print(scores)
