@@ -61,7 +61,7 @@ for full_train_index, val_index in (kfold.split(df_full_train)):
   y_pred = final_model.predict_proba(X_val).T[1]
   scores.append(roc_auc_score(target_val, y_pred))
 print ("Mean value:", np.mean(scores))
-X_test = dv.fit_transform(df_test.to_dict(orient='records'))
+X_test = dv.transform(df_test.to_dict(orient='records'))
 y_pred = final_model.predict_proba(X_test).T[1]
 print("auc on test data",roc_auc_score(target_test, y_pred))
 
