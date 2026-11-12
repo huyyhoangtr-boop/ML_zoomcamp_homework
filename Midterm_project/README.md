@@ -155,17 +155,17 @@ python send_request.py
 
 The `Dockerfile` is in `Script/`. It uses `python:3.13.9-slim`, installs `requirements.txt`, copies the model and the service code, and starts the app with **gunicorn** on port 9000.
 
-Build the image:
+Build the image: (open docker desktop first so that docker is activate)
 
 ```bash
 cd Script
-docker build -t sapa-rain-prediction .
+docker build -t midter_ml .
 ```
 
 Run the container (maps container port 9000 to host port 9000):
 
 ```bash
-docker run -it --rm -p 9000:9000 sapa-rain-prediction
+docker run -it --rm -p 9000:9000 midter_ml
 ```
 
 Then send a request from another terminal (see section 4.5):
